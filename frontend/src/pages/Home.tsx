@@ -1,14 +1,25 @@
+import { useState } from "react";
 import UploadCard from "../components/UploadCard";
-import { checkBackend } from "../services/api";
+import { uploadPolicies } from "../services/uploadApi";
 
 export default function Home() {
+  const [previousPolicy, setPreviousPolicy] = useState<File | null>(null);
+  const [updatedPolicy, setUpdatedPolicy] = useState<File | null>(null);
+
   async function handleAnalyze() {
+    if (!previousPolicy || !updatedPolicy) {
+      alert("Please select both PDF files.");
+      return;
+    }
+
     try {
-      const data = await checkBackend();
-      alert(data.message);
+      const result = await uploadPolicies(previousPolicy, updatedPolicy);
+
+      alert(result.message);
+      console.log(result);
     } catch (error) {
-      alert("Cannot connect to backend.");
       console.error(error);
+      alert("Failed to upload files.");
     }
   }
 
@@ -24,8 +35,15 @@ export default function Home() {
         </p>
 
         <div className="grid grid-cols-2 gap-6 mt-12">
-          <UploadCard title="Previous Policy" />
-          <UploadCard title="Updated Policy" />
+          <UploadCard
+            title="Previous Policy"
+            onFileSelect={setPreviousPolicy}
+          />
+
+          <UploadCard
+            title="Updated Policy"
+            onFileSelect={setUpdatedPolicy}
+          />
         </div>
 
         <div className="flex justify-center mt-10">

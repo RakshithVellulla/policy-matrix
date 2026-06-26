@@ -2,16 +2,24 @@ import { useState } from "react";
 
 type UploadCardProps = {
   title: string;
+  onFileSelect: (file: File | null) => void;
 };
 
-export default function UploadCard({ title }: UploadCardProps) {
+export default function UploadCard({
+  title,
+  onFileSelect,
+}: UploadCardProps) {
   const [fileName, setFileName] = useState("");
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0] || null;
+
+    onFileSelect(file);
 
     if (file) {
       setFileName(file.name);
+    } else {
+      setFileName("");
     }
   }
 
