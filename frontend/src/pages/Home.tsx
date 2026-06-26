@@ -1,6 +1,17 @@
 import UploadCard from "../components/UploadCard";
+import { checkBackend } from "../services/api";
 
 export default function Home() {
+  async function handleAnalyze() {
+    try {
+      const data = await checkBackend();
+      alert(data.message);
+    } catch (error) {
+      alert("Cannot connect to backend.");
+      console.error(error);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 p-10">
       <div className="max-w-6xl mx-auto">
@@ -18,7 +29,10 @@ export default function Home() {
         </div>
 
         <div className="flex justify-center mt-10">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold">
+          <button
+            onClick={handleAnalyze}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
+          >
             Analyze Policies
           </button>
         </div>
