@@ -1,32 +1,41 @@
 import { useState } from "react";
 import UploadCard from "../components/UploadCard";
+import Results from "./Results";
 import { uploadPolicies } from "../services/uploadApi";
 
 export default function Home() {
   const [previousPolicy, setPreviousPolicy] = useState<File | null>(null);
   const [updatedPolicy, setUpdatedPolicy] = useState<File | null>(null);
 
+  const [previousText, setPreviousText] = useState("");
+  const [updatedText, setUpdatedText] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
   async function handleAnalyze() {
-  if (!previousPolicy || !updatedPolicy) {
-    alert("Please select both PDF files.");
-    return;
+    if (!previousPolicy || !updatedPolicy) {
+      alert("Please select both PDF files.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const result = await uploadPolicies(previousPolicy, updatedPolicy);
+
+      setPreviousText(result.previous_text);
+      setUpdatedText(result.updated_text);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to upload files.");
+    } finally {
+      setLoading(false);
+    }
   }
-
-  try {
-    const result = await uploadPolicies(previousPolicy, updatedPolicy);
-
-    console.log(result);
-
-    alert(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error(error);
-    alert("Failed to upload files.");
-  }
-}
 
   return (
     <div className="min-h-screen bg-slate-100 p-10">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <h1 className="text-5xl font-bold text-center text-blue-700">
           Policy Matrix
         </h1>
@@ -50,11 +59,19 @@ export default function Home() {
         <div className="flex justify-center mt-10">
           <button
             onClick={handleAnalyze}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-semibold"
           >
-            Analyze Policies
+            {loading ? "Analyzing..." : "Analyze Policies"}
           </button>
         </div>
+
+        {(previousText || updatedText) && (
+          <Results
+            previousText={previousText}
+            updatedText={updatedText}
+          />
+        )}
       </div>
     </div>
   );
