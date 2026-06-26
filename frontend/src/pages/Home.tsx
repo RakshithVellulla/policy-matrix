@@ -7,21 +7,22 @@ export default function Home() {
   const [updatedPolicy, setUpdatedPolicy] = useState<File | null>(null);
 
   async function handleAnalyze() {
-    if (!previousPolicy || !updatedPolicy) {
-      alert("Please select both PDF files.");
-      return;
-    }
-
-    try {
-      const result = await uploadPolicies(previousPolicy, updatedPolicy);
-
-      alert(result.message);
-      console.log(result);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to upload files.");
-    }
+  if (!previousPolicy || !updatedPolicy) {
+    alert("Please select both PDF files.");
+    return;
   }
+
+  try {
+    const result = await uploadPolicies(previousPolicy, updatedPolicy);
+
+    console.log(result);
+
+    alert(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error(error);
+    alert("Failed to upload files.");
+  }
+}
 
   return (
     <div className="min-h-screen bg-slate-100 p-10">
