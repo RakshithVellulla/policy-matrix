@@ -9,14 +9,22 @@ export async function uploadPolicies(
   formData.append("previous_policy", previousPolicy);
   formData.append("updated_policy", updatedPolicy);
 
-  const response = await fetch(`${API_BASE_URL}/upload/`, {
-    method: "POST",
-    body: formData,
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/upload/`, {
+      method: "POST",
+      body: formData,
+    });
 
-  if (!response.ok) {
-    throw new Error("Upload failed.");
+    const text = await response.text();
+    console.log("Response:", text);
+
+    if (!response.ok) {
+      throw new Error(text);
+    }
+
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    throw error;
   }
-
-  return response.json();
 }
